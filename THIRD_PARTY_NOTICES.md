@@ -9,9 +9,11 @@ Both are released under the MIT License, like UltraRing.
 
 What UltraRing takes from them:
 
-- **The Elden Ring host DLLs** (`dinput8.dll`, `erbridge_core.dll`) are compiled, unchanged, from Minecraft Ring's
-  `bridge-base/elden-ring/er-bridge` sources at commit `711015afa67ab25c7b9597c68038718d1cef322e`. `tools/Build.ps1`
-  fetches that commit into `external/minecraft-ring`; the sources are not copied into this repository.
+- **The Elden Ring host DLLs** (`dinput8.dll`, `erbridge_core.dll`) are compiled from Minecraft Ring's
+  `bridge-base/elden-ring/er-bridge` sources: release 0.3.0 (`711015afa67ab25c7b9597c68038718d1cef322e`) plus an
+  Elden Ring 1.17.2 address table, at commit `8923324e5d2338c490945b4d4688225aa2ef0baa` of the fork
+  [LukeBeirne/Minecraft-Ring](https://github.com/LukeBeirne/Minecraft-Ring). `tools/Build.ps1` fetches that commit into
+  `external/minecraft-ring`; the sources are not copied into this repository.
 - **The shared-memory protocol**: the C# transcription (now in the ULTRAKILL Crossover Bridge kit, see below) is a transcription of Minecraft Ring's
   `bridge_protocol.h` (layout, offsets and semantics), so the unchanged host DLL can talk to ULTRAKILL.
 - **The launcher and installer flow** (`Install.ps1`, `Launch.ps1`, `Restore.ps1`) is adapted from Minecraft Ring's

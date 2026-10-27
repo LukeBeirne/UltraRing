@@ -1,6 +1,12 @@
 # Changelog
 
-## Unreleased / 0.3.0
+## Unreleased
+
+- **Elden Ring 1.17.2** (`eldenring.exe` 2.7.2.0) is supported. `tools/Build.ps1` now builds the host DLLs from
+  [LukeBeirne/Minecraft-Ring](https://github.com/LukeBeirne/Minecraft-Ring) at `8923324` (0.3.0 plus a 1.17.2 address
+  table; 1.17.1 still works) and fetches that commit into an existing `external/minecraft-ring` checkout if needed.
+
+## 0.3.0
 
 Split into two repositories. The ULTRAKILL side now lives in the reusable
 [ULTRAKILL Crossover Bridge](https://github.com/Themetralla3000/ultrakill-crossover-bridge) kit (v0.1.0), consumed here as the git submodule `bridge/`.

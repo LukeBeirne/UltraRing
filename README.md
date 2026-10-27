@@ -3,7 +3,7 @@
 **ULTRAKILL's V1 in the Lands Between — both games running at once.**
 
 [![Windows x64](https://img.shields.io/badge/platform-Windows_x64-0078D4)](#requirements)
-[![Elden Ring 1.17.1](https://img.shields.io/badge/Elden_Ring-1.17.1-C8A24A)](#requirements)
+[![Elden Ring 1.17.2](https://img.shields.io/badge/Elden_Ring-1.17.2-C8A24A)](#requirements)
 [![ULTRAKILL](https://img.shields.io/badge/ULTRAKILL-Steam-B22222)](#requirements)
 [![Status: experimental](https://img.shields.io/badge/status-experimental_0.3.0-D9A441)](CHANGELOG.md)
 [![MIT license](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
@@ -23,8 +23,8 @@ running inside Elden Ring), itself based on
 **A large part of UltraRing is their code:**
 
 - the entire Elden Ring side — the native DLLs that hook the game (camera override, invisible stand-in, terrain
-  raycasts, enemy table, damage, interactions, D3D12 compositor) — is compiled **unchanged** from Minecraft Ring's
-  source;
+  raycasts, enemy table, damage, interactions, D3D12 compositor) — is compiled from Minecraft Ring's source, unchanged
+  apart from an added address table for Elden Ring 1.17.2;
 - the shared-memory protocol is a C# transcription of their `bridge_protocol.h`;
 - the install/launch/restore scripts and the guest-side design (recalls, shared life, F8, input window, frame
   passthrough) are adapted from theirs.
@@ -71,7 +71,7 @@ The interact and switch keys can be changed in the config ([Configuration](#conf
 | Component | Supported setup |
 | --- | --- |
 | OS | Windows 10/11 x64 |
-| Elden Ring | App Ver. **1.17.1** (`eldenring.exe` **2.7.1.0**), Steam. Other builds are refused by the host DLL. |
+| Elden Ring | App Ver. **1.17.2** (`eldenring.exe` **2.7.2.0**) or **1.17.1** (`eldenring.exe` **2.7.1.0**), Steam. Other builds are refused by the host DLL. |
 | ULTRAKILL | Current Steam build (Unity 2022.3). The bridge boots it straight into the sandbox, which it uses as an empty shell. |
 | Build tools | .NET 8 SDK, Python 3, git. `tools\Build.ps1` downloads LLVM-MinGW and BepInEx 5.4.23.5 itself; compiling the guest needs ULTRAKILL's installed `Managed` DLLs. |
 | Hardware | Enough CPU/GPU/RAM to run both games at the same time. |
@@ -141,7 +141,7 @@ flowchart LR
 
 | Role | Game | Responsibilities |
 | --- | --- | --- |
-| Host | Elden Ring, with Minecraft Ring's native bridge DLL **unchanged** | World, enemies and saves; camera override; hidden stand-in that takes enemy hits; terrain ray queries; enemy table and damage application; interactions; D3D12 compositing with depth and relighting |
+| Host | Elden Ring, with Minecraft Ring's native bridge DLL (plus Elden Ring 1.17.2 support) | World, enemies and saves; camera override; hidden stand-in that takes enemy hits; terrain ray queries; enemy table and damage application; interactions; D3D12 compositing with depth and relighting |
 | Guest | ULTRAKILL, with the [ULTRAKILL Crossover Bridge](https://github.com/Themetralla3000/ultrakill-crossover-bridge) BepInEx plugin (`bridge/`) | V1 and its weapons; invisible colliders rebuilt from host rays; one hittable proxy per host enemy; frame capture; the input window glued over Elden Ring |
 
 The guest speaks the exact `bridge_protocol.h` layout of Minecraft Ring's Fabric mod, so the Elden Ring side needs
@@ -211,7 +211,7 @@ Logs: `runtime\er-bridge.log` (Elden Ring side) and `bridge\dist\guest\BepInEx\L
 | `tools/` | `Build.ps1` (host DLLs + the kit's build), `Stop.ps1`, `Focus.ps1`, shared helpers |
 | `Install.ps1`, `Launch.ps1`, `Restore.ps1` | Elden Ring install/launch/restore; the ULTRAKILL part delegates to the kit's `Install-Guest.ps1`, `Launch-Guest.ps1`, `Uninstall-Guest.ps1` |
 | `docs/research/` | History: host contract, ULTRAKILL internals, reviews, toolchain notes (current docs are in the kit) |
-| `external/` | Pinned Minecraft Ring checkout (`711015a`), fetched by `Build.ps1`, not committed |
+| `external/` | Pinned Minecraft Ring checkout (`8923324`: 0.3.0 plus Elden Ring 1.17.2 support, from [LukeBeirne/Minecraft-Ring](https://github.com/LukeBeirne/Minecraft-Ring)), fetched by `Build.ps1`, not committed |
 
 ## Credits
 

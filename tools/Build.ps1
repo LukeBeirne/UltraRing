@@ -28,8 +28,8 @@ $Root = Split-Path -Parent $PSScriptRoot
 $Tools = Join-Path $Root '.tools'
 
 # Pinned versions (docs/research/toolchain.md)
-$McRingUrl = 'https://github.com/siddoff/Minecraft-Ring'
-$McRingCommit = '711015afa67ab25c7b9597c68038718d1cef322e'
+$McRingUrl = 'https://github.com/LukeBeirne/Minecraft-Ring'
+$McRingCommit = '8923324e5d2338c490945b4d4688225aa2ef0baa'  # 0.3.0 + Elden Ring 1.17.2 support
 $LlvmTag = '20261006'
 $LlvmName = "llvm-mingw-$LlvmTag-ucrt-x86_64"
 $LlvmUrl = "https://github.com/mstorsjo/llvm-mingw/releases/download/$LlvmTag/$LlvmName.zip"
@@ -66,6 +66,12 @@ if (-not $SkipNative) {
     }
     $Head = (& git -C $McDir rev-parse HEAD).Trim()
     if ($Head -ne $McRingCommit) {
+        # An older checkout may come from another remote (e.g. upstream before this fork): fetch the pin from $McRingUrl.
+        & git -C $McDir cat-file -e "$McRingCommit^{commit}" 2>$null
+        if ($LASTEXITCODE -ne 0) {
+            & git -C $McDir fetch --quiet $McRingUrl
+            if ($LASTEXITCODE -ne 0) { throw "Could not fetch $McRingUrl into $McDir." }
+        }
         Write-Host "    checking out $McRingCommit (was $Head)"
         & git -C $McDir checkout --quiet $McRingCommit
         if ($LASTEXITCODE -ne 0) { throw "Could not check out $McRingCommit in $McDir." }
