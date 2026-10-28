@@ -5,6 +5,12 @@
 - **Elden Ring 1.17.2** (`eldenring.exe` 2.7.2.0) is supported. `tools/Build.ps1` now builds the host DLLs from
   [LukeBeirne/Minecraft-Ring](https://github.com/LukeBeirne/Minecraft-Ring) at `8923324` (0.3.0 plus a 1.17.2 address
   table; 1.17.1 still works) and fetches that commit into an existing `external/minecraft-ring` checkout if needed.
+- **Kit submodule** now comes from [LukeBeirne/ultrakill-crossover-bridge](https://github.com/LukeBeirne/ultrakill-crossover-bridge)
+  branch `ultraring-fixes` (kit 0.1.2 plus fixes): run `git submodule sync` and `git submodule update --init` in an existing clone.
+  - Rocket rides: terrain is sampled ahead along the rocket's path (rides zero V1's own velocity), so V1 no longer flies
+    through walls that were never sampled.
+  - F8/F9/F10 also work when another program (overlay, voice chat, peripheral software) has the key as a global hotkey.
+  - F9 diagnostics are visible in Elden Ring (they were drawn on ULTRAKILL's invisible window) and show V1's speed.
 
 ## 0.3.0
 
