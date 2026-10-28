@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+- **Kit features with Elden Ring.** The host DLLs now come from
+  [LukeBeirne/Minecraft-Ring](https://github.com/LukeBeirne/Minecraft-Ring) at `858be28`, which implements the kit's
+  optional extensions for Elden Ring (`ultrakill.cpp`). They switch on only while the ULTRAKILL guest is attached:
+  - host-owned health: the Tarnished's HP is V1's bar; dash/hurt i-frames and punch parries cancel Elden Ring hits,
+    ULTRAKILL heals heal the Tarnished, a lethal hit kills V1 first and then the Tarnished;
+  - weapon progression: one weapon at the start, one more per boss defeated in the save (global boss flags
+    9100-9299), order fixed per character;
+  - stats: Dexterity drives attack speed, max FP alt-fire recharge, max stamina dash recharge;
+  - stat damage: V1's damage scales with the best weapon's attack rating;
+  - menu hand-off: Site of Grace, talking and item pop-ups give Elden Ring the controls until they close.
+  - Settings in `runtime\er-bridge.ini` (`[ULTRAKILL]`).
+- `tools/Build.ps1` no longer stops when the pinned Minecraft Ring commit is missing from an existing checkout
+  (Windows PowerShell turned git's stderr into an error before the fetch could run).
+
 - **Elden Ring 1.17.2** (`eldenring.exe` 2.7.2.0) is supported. `tools/Build.ps1` now builds the host DLLs from
   [LukeBeirne/Minecraft-Ring](https://github.com/LukeBeirne/Minecraft-Ring) at `8923324` (0.3.0 plus a 1.17.2 address
   table; 1.17.1 still works) and fetches that commit into an existing `external/minecraft-ring` checkout if needed.

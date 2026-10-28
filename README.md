@@ -23,8 +23,9 @@ running inside Elden Ring), itself based on
 **A large part of UltraRing is their code:**
 
 - the entire Elden Ring side — the native DLLs that hook the game (camera override, invisible stand-in, terrain
-  raycasts, enemy table, damage, interactions, D3D12 compositor) — is compiled from Minecraft Ring's source, unchanged
-  apart from an added address table for Elden Ring 1.17.2;
+  raycasts, enemy table, damage, interactions, D3D12 compositor) — is compiled from Minecraft Ring's source, with an
+  added address table for Elden Ring 1.17.2 and the host side of the kit's ULTRAKILL extensions (`ultrakill.cpp`:
+  health, stats, weapon progression, menu hand-off);
 - the shared-memory protocol is a C# transcription of their `bridge_protocol.h`;
 - the install/launch/restore scripts and the guest-side design (recalls, shared life, F8, input window, frame
   passthrough) are adapted from theirs.
@@ -43,16 +44,18 @@ licensed; their notices are kept in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES
 | **Camera** | Elden Ring renders from V1's eyes every frame: position, look direction, roll and V1's field of view. |
 | **Movement** | All of ULTRAKILL's movement on Elden Ring ground: walk, slide, dash (with its i-frames), jump, ground slam, slide-jump, wall jumps. 1 ULTRAKILL unit = 0.5 m, so V1 is 1.75 m tall, like the Tarnished. |
 | **Terrain** | Elden Ring's collision is sampled with the game's own raycasts around V1 and rebuilt as invisible ULTRAKILL colliders: floors, slopes, stairs, walls (knee/chest/head probes), ceilings. Sampling looks ahead of V1's velocity, and every zone you visit is cached on disk so revisited areas have collision instantly. |
-| **Stand-in** | The Tarnished stays in the world as an invisible stand-in pinned to V1's feet and facing. Enemies aggro and attack it as usual; it never dies on its own and its HP loss is forwarded to V1. |
+| **Stand-in** | The Tarnished stays in the world as an invisible stand-in pinned to V1's feet and facing. Enemies aggro and attack it as usual. |
+| **Health** | The Tarnished's HP **is** V1's health: V1's bar shows its Elden Ring HP, so Vigor, armour, talismans and flasks (drunk after F8) all count. A hit while V1 dashes or still has its hurt i-frames is undone. |
 | **Weapons** | Revolver (all variants, headshots, coins and ricochets), shotgun, nailgun (nails, saws, magnets), railcannon, rocket launcher, explosions, punches and the ground slam all hit Elden Ring enemies. Every enemy within 80 m gets an invisible ULTRAKILL hitbox with a weak-point head. |
-| **Damage out** | ULTRAKILL damage is converted to a share of the enemy's max HP (by default 1 ULTRAKILL health point = 60 Elden Ring HP: a soldier dies to a couple of revolver shots, bosses take a while). Elden Ring plays the hit reactions, deaths, rune drops and kill credit. |
-| **Damage in** | When an enemy hits the stand-in, V1 loses the same share of its health (a hit that would take 20 % of the Tarnished's HP takes 20 HP from V1). Dashing through an attack dodges it, exactly as in ULTRAKILL. |
-| **Style and blood** | The style meter, freshness, kill streaks and blood healing work on Elden Ring enemies: get close and get bloody to heal. |
-| **Parry** | Punch right before an enemy's attack lands: the hit is cancelled, V1 gets the parry flash, full heal and style, and the attacker takes a heavy blow (25 % of its max HP, 8 % for bosses). |
+| **Weapon progression** | V1 starts with one weapon and unlocks one more (in a random order fixed per character) for every boss you have defeated in that save: main bosses, catacombs, caves, tunnels, divine towers and forts count. |
+| **Damage out** | ULTRAKILL damage scales with the attack rating of your best Elden Ring weapon, so upgrading weapons and levelling makes V1 stronger. Elden Ring plays the hit reactions, deaths, rune drops and kill credit. |
+| **Stats** | Dexterity speeds up V1's weapons, max FP (Mind) speeds up alt-fire recharge, max stamina (Endurance) speeds up dash recharge. |
+| **Style and blood** | The style meter, freshness, kill streaks and blood healing work on Elden Ring enemies: get close and get bloody to heal the Tarnished. |
+| **Parry** | Punch right before a nearby enemy's attack lands: the hit is cancelled, V1 gets the parry flash, heal and style, and the attacker takes a heavy blow (25 % of its max HP, 8 % for bosses). |
 | **Whiplash** | Hooks any Elden Ring enemy and pulls V1 to it (Elden Ring enemies are always "heavy"). |
 | **Shared life** | V1 dies, the Tarnished dies (YOU DIED, runes on the ground). The Tarnished dies in Elden Ring (e.g. falling off the map), V1 dies. When Elden Ring respawns you at a Site of Grace, V1 is moved there. |
 | **Interactions** | Elden Ring's prompts ("Open", "Pick up", "Touch grace"...) appear on V1's HUD; press **V** to perform them. Doors and levers re-sample the terrain once they move. |
-| **Control switch** | **F8** hands camera and controls back to Elden Ring (menus, map, inventory, leveling up, ladders); F8 in Elden Ring returns to V1, who is moved to wherever the Tarnished is. |
+| **Control switch** | **F8** hands camera and controls back to Elden Ring (menus, map, inventory, leveling up, ladders); F8 in Elden Ring returns to V1, who is moved to wherever the Tarnished is. Menus opened with **V** (Site of Grace, talking, item pop-ups) hand control to Elden Ring by themselves and give it back when they close. |
 
 ## Controls
 
@@ -144,8 +147,10 @@ flowchart LR
 | Host | Elden Ring, with Minecraft Ring's native bridge DLL (plus Elden Ring 1.17.2 support) | World, enemies and saves; camera override; hidden stand-in that takes enemy hits; terrain ray queries; enemy table and damage application; interactions; D3D12 compositing with depth and relighting |
 | Guest | ULTRAKILL, with the [ULTRAKILL Crossover Bridge](https://github.com/Themetralla3000/ultrakill-crossover-bridge) BepInEx plugin (`bridge/`) | V1 and its weapons; invisible colliders rebuilt from host rays; one hittable proxy per host enemy; frame capture; the input window glued over Elden Ring |
 
-The guest speaks the exact `bridge_protocol.h` layout of Minecraft Ring's Fabric mod, so the Elden Ring side needs
-no changes at all. Per frame the guest:
+The guest speaks the exact `bridge_protocol.h` layout of Minecraft Ring's Fabric mod. On top of it, the kit's
+optional extension blocks (`bridge_protocol_ext.h`) carry health, stats, weapon progression and menu hand-off; the
+Elden Ring DLL only uses them while an ULTRAKILL guest is attached, so Minecraft Ring keeps working unchanged. Per
+frame the guest:
 
 1. reads Elden Ring's state (zone, stand-in position, window, life) from `bridge.shm`;
 2. lets ULTRAKILL simulate V1 against the colliders built from earlier ray batches, and submits new rays;
@@ -177,6 +182,20 @@ while you only see Elden Ring.
 | Terrain | `PersistentCache` | true | Keep sampled terrain per zone in `runtime\terrain-cache`. |
 | Debug | `Overlay` | false | Start with the F9 diagnostics shown. |
 
+The kit's own options (`[Combat] HealthModel`, `[Stats]`, `[Loadout]`, `[Interaction] AutoHostInput`...) are listed in
+[the kit's guest reference](bridge/docs/guest-reference.md). The Elden Ring side has its own settings in
+`runtime\er-bridge.ini` (created on the first run, read when Elden Ring starts):
+
+| Key | Default | Meaning |
+| --- | --- | --- |
+| `HostHealth` | 1 | The Tarnished's HP is V1's health (0: V1 keeps ULTRAKILL's 100 HP and takes a share of each hit). |
+| `HealScale` | 0.5 | Elden Ring HP healed per 100 ULTRAKILL HP of healing, as a share of max HP. |
+| `Stats` | 1 | Attributes drive V1's attack speed and recharge rates. |
+| `StatDamage` | 1 | V1's damage follows the attack rating (0: `HostHpPerUkHp` decides). |
+| `DamageScale` | 0.2 | Elden Ring HP per point of attack rating per ULTRAKILL damage point (times a per-weapon factor). |
+| `Loadout` | Progression | `Progression` (one weapon per boss), `All` (every weapon) or `Guest` (the guest's `[Loadout] Mode`). |
+| `MenuInput` | 1 | Hand control to Elden Ring while one of its menus is open. |
+
 ## Troubleshooting
 
 | Symptom | Fix |
@@ -200,7 +219,9 @@ Logs: `runtime\er-bridge.log` (Elden Ring side) and `bridge\dist\guest\BepInEx\L
   keep one floor and one ceiling per 0.5 m column.
 - Elden Ring enemies cannot be knocked back, pulled or launched by ULTRAKILL; enemy projectiles exist only in
   Elden Ring, so parries are melee-timed punches.
-- Ladders, menus, the map and leveling need Elden Ring's controls (F8).
+- Ladders, the map, the inventory and leveling need Elden Ring's controls (F8). Menus that open on their own
+  (some tutorial pop-ups) may need F8 too.
+- Shadow of the Erdtree bosses do not count towards weapon progression yet.
 - Single-player only; Seamless Coop and other Elden Ring DLL mods are moved aside while installed.
 
 ## Development
