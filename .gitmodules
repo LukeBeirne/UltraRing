@@ -1,4 +1,4 @@
 [submodule "bridge"]
 	path = bridge
 	url = https://github.com/LukeBeirne/ultrakill-crossover-bridge.git
-	branch = ultraring-fixes
+	branch = main

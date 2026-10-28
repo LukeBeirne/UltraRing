@@ -6,7 +6,7 @@
   [LukeBeirne/Minecraft-Ring](https://github.com/LukeBeirne/Minecraft-Ring) at `8923324` (0.3.0 plus a 1.17.2 address
   table; 1.17.1 still works) and fetches that commit into an existing `external/minecraft-ring` checkout if needed.
 - **Kit submodule** now comes from [LukeBeirne/ultrakill-crossover-bridge](https://github.com/LukeBeirne/ultrakill-crossover-bridge)
-  branch `ultraring-fixes` (upstream kit `main` as of `663ed6c` plus fixes): run `git submodule sync` and
+  `main` (upstream kit `main` as of `663ed6c` plus fixes): run `git submodule sync` and
   `git submodule update --init` in an existing clone.
   - Upstream kit changes since 0.1.2 are included. Their host features (host-owned health, stats, weapon progression,
     native prompts, stat damage) stay off because the Elden Ring DLL does not advertise them. Changes that do apply with
