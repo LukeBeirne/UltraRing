@@ -158,7 +158,7 @@ while you only see Elden Ring.
 
 ## Configuration
 
-`bridge\dist\guest\BepInEx\config\dev.ukbridge.guest.cfg` (created on the first run; `Build.ps1` restages that folder, so copy the file aside if you want to keep edits across rebuilds):
+`bridge\dist\guest\BepInEx\config\dev.ukbridge.guest.cfg` (created on the first run; `Build.ps1` refreshes only the binaries there, so your edits survive rebuilds):
 
 | Section | Key | Default | Meaning |
 | --- | --- | --- | --- |

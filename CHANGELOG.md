@@ -6,11 +6,18 @@
   [LukeBeirne/Minecraft-Ring](https://github.com/LukeBeirne/Minecraft-Ring) at `8923324` (0.3.0 plus a 1.17.2 address
   table; 1.17.1 still works) and fetches that commit into an existing `external/minecraft-ring` checkout if needed.
 - **Kit submodule** now comes from [LukeBeirne/ultrakill-crossover-bridge](https://github.com/LukeBeirne/ultrakill-crossover-bridge)
-  branch `ultraring-fixes` (kit 0.1.2 plus fixes): run `git submodule sync` and `git submodule update --init` in an existing clone.
+  branch `ultraring-fixes` (upstream kit `main` as of `663ed6c` plus fixes): run `git submodule sync` and
+  `git submodule update --init` in an existing clone.
+  - Upstream kit changes since 0.1.2 are included. Their host features (host-owned health, stats, weapon progression,
+    native prompts, stat damage) stay off because the Elden Ring DLL does not advertise them. Changes that do apply with
+    Elden Ring: cheats are off while bridged (`AllowCheats`), `WorldAlpha = Matte` by default (one extra world render;
+    `MaxRgb` is the old single pass), void rescue after long falls (`VoidRescue`, `VoidRescueDepth`), holding the
+    interact key repeats it (`HoldRepeat`), and the kit's build keeps the staged guest's config and logs.
   - Rocket rides: terrain is sampled ahead along the rocket's path (rides zero V1's own velocity), so V1 no longer flies
     through walls that were never sampled.
   - F8/F9/F10 also work when another program (overlay, voice chat, peripheral software) has the key as a global hotkey.
   - F9 diagnostics are visible in Elden Ring (they were drawn on ULTRAKILL's invisible window) and show V1's speed.
+  - F8 from Elden Ring no longer bounces straight back to Elden Ring.
 
 ## 0.3.0
 
